@@ -38,5 +38,6 @@ func freeLog(log *Log) {
 	log.Format = ""
 	log.Args = nil
 	log.Fields = log.Fields[:0]
+	log.logger = nil
 	logPool.Put(log)
 }

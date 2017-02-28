@@ -21,7 +21,7 @@ func TestJSONEncoder(t *testing.T) {
 		Args: []interface{}{"aa", 1},
 	}
 
-	log.WithFields(
+	log.appendFields(
 		"A", 1,
 		"B", true,
 		"C", 1.1,

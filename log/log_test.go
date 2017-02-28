@@ -6,7 +6,7 @@ import (
 )
 
 func TestConsoleLog(t *testing.T) {
-	DefaultLogger = New(LevelDebug, 0, 0, NewTextEncoder("", "")).AddWriter(NewConsoleWriter(nil).DisableColor())
+	DefaultLogger = New(LevelDebug, 0, 0, NewTextEncoder("", "")).AddWriter(Console())
 	Debug("aaa1")
 	Info("aaa2")
 	Warn("aaa4")
@@ -15,8 +15,8 @@ func TestConsoleLog(t *testing.T) {
 
 func TestFileLog(t *testing.T) {
 	logger := New(LevelDebug, 0, 0, NewJSONEncoder(""))
-	logger.AddWriter(NewConsoleWriter(nil))
-	fw, err := NewFileWriter(logger.Level(), "logs", 1024*10, false)
+	logger.AddWriter(Console())
+	fw, err := Multifile(logger.Level(), "logs", 1024*10)
 	if err != nil {
 		t.Fatal(err)
 	}

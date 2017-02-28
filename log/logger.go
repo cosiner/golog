@@ -41,12 +41,13 @@ type (
 	}
 
 	logger struct {
-		encoder       Encoder
-		level         Level
-		writers       []Writer
+		encoder Encoder
+		level   Level
+		writers []Writer
+		prefix  string
+
 		flushInterval time.Duration
 		flush         chan struct{}
-		prefix        string
 
 		closeFlag int32
 	}
@@ -68,6 +69,7 @@ func New(level Level, flushSeconds, backlog int, encoder Encoder) Logger {
 		l.flush = make(chan struct{}, 1)
 		l.flushInterval = time.Duration(flushSeconds) * time.Second
 	}
+	l.start()
 	return l
 }
 
@@ -81,10 +83,6 @@ func (l *logger) markClosed() bool {
 
 func (l *logger) AddWriter(w Writer) Logger {
 	l.writers = append(l.writers, w)
-	if len(l.writers) == 1 {
-		l.start()
-	}
-
 	return l
 }
 
@@ -108,7 +106,10 @@ func (l *logger) start() {
 		for {
 			select {
 			case <-ticker:
-			case <-l.flush:
+			case _, ok := <-l.flush:
+				if !ok {
+					return
+				}
 			}
 
 			for _, writer := range l.writers {
@@ -145,7 +146,10 @@ func (l *logger) Write(log *Log) {
 
 func (l *logger) Flush() {
 	if !l.isClosed() && l.flush != nil {
-		l.flush <- struct{}{}
+		select {
+		case l.flush <- struct{}{}:
+		default:
+		}
 	}
 }
 
@@ -156,6 +160,7 @@ func (l *logger) Close() {
 	for _, w := range l.writers {
 		w.Close()
 	}
+	close(l.flush)
 }
 
 func (l *logger) newLog(prefix string) *Log {
@@ -167,11 +172,11 @@ func (l *logger) newLog(prefix string) *Log {
 }
 
 func (l *logger) WithField(key string, val interface{}) *Log {
-	return l.newLog(l.prefix).WithField(key, val)
+	return l.newLog(l.prefix).appendField(key, val)
 }
 
 func (l *logger) WithFields(args ...interface{}) *Log {
-	return l.newLog(l.prefix).WithFields(args...)
+	return l.newLog(l.prefix).appendFields(args...)
 }
 
 func (l *logger) Depth(level Level, depth int, args ...interface{}) {
@@ -232,7 +237,7 @@ func (l *logger) Fatal(args ...interface{}) {
 	l.Depth(LevelFatal, 1, args...)
 }
 
-var DefaultLogger = New(LevelDebug, 0, 0, NewTextEncoder("", "")).AddWriter(NewConsoleWriter())
+var DefaultLogger = New(LevelDebug, 0, 0, NewTextEncoder("", "")).AddWriter(Console())
 
 func Depth(level Level, depth int, args ...interface{}) {
 	DefaultLogger.Depth(level, depth+1, args...)

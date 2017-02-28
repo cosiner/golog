@@ -1,35 +1,28 @@
 package log
 
 import (
-	"io"
 	"os"
 	"sync"
 )
 
-type ConsoleWriter struct {
-	stdout io.Writer
-	stderr io.Writer
-
+type consoleWriter struct {
 	mu sync.Mutex
 }
 
-func NewConsoleWriter() *ConsoleWriter {
-	return &ConsoleWriter{
-		stdout: os.Stdout,
-		stderr: os.Stderr,
-	}
+func Console() Writer {
+	return &consoleWriter{}
 }
 
-func (w *ConsoleWriter) Write(level Level, bytes []byte) error {
+func (w *consoleWriter) Write(level Level, bytes []byte) error {
 	w.mu.Lock()
-	out := w.stdout
+	out := os.Stdout
 	if level >= LevelError {
-		out = w.stderr
+		out = os.Stderr
 	}
 	_, err := out.Write(bytes)
 	w.mu.Unlock()
 	return err
 }
 
-func (w *ConsoleWriter) Flush() {}
-func (w *ConsoleWriter) Close() {}
+func (w *consoleWriter) Flush() {}
+func (w *consoleWriter) Close() {}

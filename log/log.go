@@ -1,11 +1,11 @@
 package log
 
 import (
+	"strings"
+	"time"
 	"fmt"
 	"os"
 	"runtime"
-	"strings"
-	"time"
 )
 
 type Level uint8
@@ -75,22 +75,19 @@ type (
 	}
 )
 
-func (log *Log) WithField(key string, val interface{}) *Log {
-	log.Fields = append(log.Fields, Field{
-		Key:   key,
-		Value: val,
-	})
+func (log *Log) appendField(key string, val interface{}) *Log {
+	log.Fields = append(log.Fields, )
 	return log
 }
 
-func (log *Log) WithFields(args ...interface{}) *Log {
+func (log *Log) appendFields(args ...interface{}) *Log {
 	l := len(args)
 	for i := 0; i < l; {
 		arg := args[i]
 		switch arg := arg.(type) {
 		case string:
 			if i < l-1 {
-				log.WithField(arg, args[i+1])
+				log.appendField(arg, args[i+1])
 			}
 			i += 2
 		case Field:
