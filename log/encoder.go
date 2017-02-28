@@ -127,6 +127,14 @@ func (t *TypeEncoder) EncodeVal(buf *bytes.Buffer, val interface{}) {
 		for _, v := range v {
 			t.EncodeDuration(buf, v)
 		}
+	case fmt.Stringer:
+		t.EncodeString(buf, v.String())
+	case error:
+		if v != nil {
+			t.EncodeString(buf, v.Error())
+		} else {
+			t.EncodeString(buf, "")
+		}
 	default:
 		t.Default(buf, v)
 	}
