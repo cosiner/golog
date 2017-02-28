@@ -23,9 +23,6 @@ func NewTextEncoder(timeformat, separator string) Encoder {
 			Default: func(buf *bytes.Buffer, v interface{}) {
 				fmt.Fprint(buf, v)
 			},
-			String: func(buf *bytes.Buffer, s string) {
-				buf.WriteString(s)
-			},
 		},
 		Separator: separator,
 	}

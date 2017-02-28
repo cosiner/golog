@@ -108,13 +108,11 @@ func (l *logger) start() {
 		for {
 			select {
 			case <-ticker:
-				for _, writer := range l.writers {
-					writer.Flush()
-				}
 			case <-l.flush:
-				for _, writer := range l.writers {
-					writer.Flush()
-				}
+			}
+
+			for _, writer := range l.writers {
+				writer.Flush()
 			}
 		}
 	}(l)
@@ -234,7 +232,7 @@ func (l *logger) Fatal(args ...interface{}) {
 	l.Depth(LevelFatal, 1, args...)
 }
 
-var DefaultLogger = New(LevelDebug, 0, 0, NewTextEncoder("", "")).AddWriter(NewConsoleWriter(nil))
+var DefaultLogger = New(LevelDebug, 0, 0, NewTextEncoder("", "")).AddWriter(NewConsoleWriter())
 
 func Depth(level Level, depth int, args ...interface{}) {
 	DefaultLogger.Depth(level, depth+1, args...)
@@ -290,4 +288,12 @@ func Panic(args ...interface{}) {
 
 func Fatal(args ...interface{}) {
 	DefaultLogger.Depth(LevelFatal, 1, args...)
+}
+
+func WithField(key string, val interface{}) *Log {
+	return DefaultLogger.WithField(key, val)
+}
+
+func WithFields(args ...interface{}) *Log {
+	return DefaultLogger.WithFields()
 }
