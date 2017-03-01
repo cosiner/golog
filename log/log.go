@@ -165,15 +165,24 @@ func isPathSeparator(r rune) bool {
 	return r == '/' || r == os.PathSeparator
 }
 
-func callerPos(depth int) string {
-	_, file, line, _ := runtime.Caller(depth + 1)
-	i := strings.LastIndexFunc(file, isPathSeparator)
-	if i >= 0 {
-		j := strings.LastIndexFunc(file[:i], isPathSeparator)
-		if j >= 0 {
-			i = j
+func lastIndexFuncN(s string, fn func(rune) bool, n int) int {
+	var end = len(s)
+	for i := 0; i < n; i++ {
+		index := strings.LastIndexFunc(s[:end], fn)
+		if index < 0 {
+			break
 		}
-		file = file[i+1:]
+		end = index
+	}
+	return end
+}
+
+func callerPos(depth int) string {
+	const Level = 3
+	_, file, line, _ := runtime.Caller(depth + 1)
+	end := lastIndexFuncN(file, isPathSeparator, Level)
+	if end >= 0 {
+		file = file[end+1:]
 	}
 	return fmt.Sprintf("%s:%d", file, line)
 }

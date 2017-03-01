@@ -24,6 +24,7 @@ func TestFileLog(t *testing.T) {
 	logger.Warn("DDDDDDDDDDDDDDDD")
 	logger.Info("DDDDDDDDDDDDDDDD")
 	logger.Debug("DDDDDDDDDDDDDDDD")
+	logger.Error("DDDDDDDDDDDDDDDD")
 	logger.Close()
 	time.Sleep(100 * time.Millisecond)
 }
