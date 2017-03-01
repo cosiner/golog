@@ -2,6 +2,7 @@ package log
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"time"
@@ -15,6 +16,7 @@ type TypeEncoder struct {
 	Timeformat string
 	Default    func(buf *bytes.Buffer, v interface{})
 	String     func(buf *bytes.Buffer, s string)
+	Bytes      func(buf *bytes.Buffer, b []byte)
 }
 
 func (t *TypeEncoder) EncodeVal(buf *bytes.Buffer, val interface{}) {
@@ -75,10 +77,6 @@ func (t *TypeEncoder) EncodeVal(buf *bytes.Buffer, val interface{}) {
 		for _, v := range v {
 			t.EncodeInt(buf, int64(v))
 		}
-	case []uint8:
-		for _, v := range v {
-			t.EncodeUint(buf, uint64(v))
-		}
 	case []uint16:
 		for _, v := range v {
 			t.EncodeUint(buf, uint64(v))
@@ -135,6 +133,10 @@ func (t *TypeEncoder) EncodeVal(buf *bytes.Buffer, val interface{}) {
 		} else {
 			t.EncodeString(buf, "")
 		}
+	case []byte:
+		t.EncodeBytes(buf, v)
+	case *json.RawMessage:
+		t.EncodeBytes(buf, *v)
 	default:
 		t.Default(buf, v)
 	}
@@ -178,12 +180,36 @@ func (t *TypeEncoder) EncodeString(buf *bytes.Buffer, s string) {
 		return
 	}
 
+	t.EncodeStringWithQuote(buf, s)
+}
+
+func (t *TypeEncoder) EncodeStringWithQuote(buf *bytes.Buffer, s string) {
 	buf.WriteByte('"')
 	for _, b := range s {
 		if b == '"' {
 			buf.WriteByte('\\')
 		}
 		buf.WriteRune(b)
+	}
+	buf.WriteByte('"')
+}
+
+func (t *TypeEncoder) EncodeBytes(buf *bytes.Buffer, bs []byte) {
+	if t.Bytes != nil {
+		t.Bytes(buf, bs)
+		return
+	}
+
+	t.EncodeBytesWithQuote(buf, bs)
+}
+
+func (t *TypeEncoder) EncodeBytesWithQuote(buf *bytes.Buffer, bs []byte) {
+	buf.WriteByte('"')
+	for _, b := range bs {
+		if b == '"' {
+			buf.WriteByte('\\')
+		}
+		buf.WriteByte(b)
 	}
 	buf.WriteByte('"')
 }

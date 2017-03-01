@@ -21,6 +21,9 @@ func NewJSONEncoder(timeformat string) Encoder {
 				bytes, _ := json.Marshal(v)
 				buf.Write(bytes)
 			},
+			Bytes: func(buf *bytes.Buffer, b []byte) {
+				buf.Write(b)
+			},
 		},
 	}
 }
