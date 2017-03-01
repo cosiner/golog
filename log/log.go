@@ -1,11 +1,11 @@
 package log
 
 import (
-	"strings"
-	"time"
 	"fmt"
 	"os"
 	"runtime"
+	"strings"
+	"time"
 )
 
 type Level uint8
@@ -76,7 +76,7 @@ type (
 )
 
 func (log *Log) appendField(key string, val interface{}) *Log {
-	log.Fields = append(log.Fields, )
+	log.Fields = append(log.Fields, Field{Key: key, Value: val})
 	return log
 }
 
