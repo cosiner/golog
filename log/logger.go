@@ -300,5 +300,5 @@ func WithField(key string, val interface{}) *Log {
 }
 
 func WithFields(args ...interface{}) *Log {
-	return DefaultLogger.WithFields()
+	return DefaultLogger.WithFields(args...)
 }
