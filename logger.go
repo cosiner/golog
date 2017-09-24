@@ -1,7 +1,8 @@
-package log
+package golog
 
 import (
 	"os"
+	"sync"
 	"sync/atomic"
 	"time"
 )
@@ -41,6 +42,7 @@ type (
 	}
 
 	logger struct {
+		wg      sync.WaitGroup
 		encoder Encoder
 		level   Level
 		writers []Writer
@@ -119,24 +121,35 @@ func (l *logger) start() {
 	}(l)
 }
 
+func (l *logger) doWrite(log *Log) {
+	l.wg.Add(1)
+	defer l.wg.Done()
+
+	level := log.Level
+	buf := allocBuffer()
+	l.encoder.Encode(buf, log)
+	freeLog(log)
+
+	bytes := buf.Bytes()
+	for _, writer := range l.writers {
+		if l.isClosed() {
+			break
+		}
+		writer.Write(level, bytes)
+	}
+	freeBuffer(buf)
+}
+
 func (l *logger) Write(log *Log) {
 	level := log.Level
 	if level < l.level || l.isClosed() {
 		freeLog(log)
 		return
 	}
-
-	buf := allocBuffer()
-	l.encoder.Encode(buf, log)
-	bytes := buf.Bytes()
-	for _, writer := range l.writers {
-		writer.Write(level, bytes)
-	}
-	freeBuffer(buf)
-	freeLog(log)
+	l.doWrite(log)
 
 	if level == LevelPanic {
-		panic(string(bytes))
+		panic(log.panicInfo())
 	}
 	if level == LevelFatal {
 		l.Close()
@@ -145,9 +158,10 @@ func (l *logger) Write(log *Log) {
 }
 
 func (l *logger) Flush() {
-	if !l.isClosed() && l.flush != nil {
+	f := l.flush
+	if !l.isClosed() && f != nil {
 		select {
-		case l.flush <- struct{}{}:
+		case f <- struct{}{}:
 		default:
 		}
 	}
@@ -157,6 +171,8 @@ func (l *logger) Close() {
 	if !l.markClosed() {
 		return
 	}
+	l.wg.Wait()
+
 	for _, w := range l.writers {
 		w.Close()
 	}

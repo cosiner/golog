@@ -1,4 +1,4 @@
-package log
+package golog
 
 import (
 	"fmt"
@@ -74,6 +74,13 @@ type (
 		Fields []Field
 	}
 )
+
+func (log *Log) panicInfo() string {
+	if log.Format == "" {
+		return fmt.Sprint(log.Args...)
+	}
+	return fmt.Sprintf(log.Format, log.Args...)
+}
 
 func (log *Log) appendField(key string, val interface{}) *Log {
 	log.Fields = append(log.Fields, Field{Key: key, Value: val})

@@ -1,4 +1,4 @@
-package log
+package golog
 
 import (
 	"bufio"
@@ -40,7 +40,7 @@ func (bf *buffedFile) init(name string, bufsize int) error {
 
 func (bf *buffedFile) Close() {
 	if bf.file != nil {
-		bf.Flush()
+		bf.Writer.Flush()
 		bf.file.Close()
 	}
 }
