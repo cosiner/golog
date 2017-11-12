@@ -55,6 +55,7 @@ func (j *JSONEncoder) Encode(buf *bytes.Buffer, log *Log) error {
 		}
 		msg = log.Prefix + s
 	}
+	buf.WriteByte(',')
 	j.encodeKeyValue(buf, "msg", msg)
 
 	for i := range log.Fields {

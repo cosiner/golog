@@ -5,21 +5,31 @@ import (
 	"sync"
 )
 
+type ColorRender func([]byte) []byte
 type consoleWriter struct {
 	mu sync.Mutex
+
+	renders     []ColorRender
+	renderCount uint8
+	renderCurr  uint8
 }
 
-func Console() Writer {
-	return &consoleWriter{}
+func Console(renders ...ColorRender) Writer {
+	w := consoleWriter{
+		renderCount: uint8(len(renders)),
+		renders:     renders,
+	}
+	return &w
 }
 
 func (w *consoleWriter) Write(level Level, bytes []byte) error {
 	w.mu.Lock()
-	out := os.Stdout
-	if level >= LevelError {
-		out = os.Stderr
+	if w.renderCount > 0 {
+		render := w.renders[w.renderCurr%w.renderCount]
+		w.renderCurr++
+		bytes = render(bytes)
 	}
-	_, err := out.Write(bytes)
+	_, err := os.Stderr.Write(bytes)
 	w.mu.Unlock()
 	return err
 }
