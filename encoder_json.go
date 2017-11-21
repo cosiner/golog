@@ -18,7 +18,8 @@ func NewJSONEncoder(timeformat string) Encoder {
 		TypeEncoder: TypeEncoder{
 			Timeformat: timeformat,
 			Default: func(buf *bytes.Buffer, v interface{}) {
-				json.NewEncoder(buf).Encode(v)
+				data, _ := json.Marshal(v)
+				buf.Write(data)
 			},
 			Bytes: func(buf *bytes.Buffer, b []byte) {
 				buf.Write(b)
