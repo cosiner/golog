@@ -28,6 +28,7 @@ func TestJSONEncoder(t *testing.T) {
 		"D", complex(1, 1),
 		"E", time.Now(),
 		"G", `"aaa"`,
+		"C", []string{},
 		Field{"F", []int{1, 2, 3}},
 	)
 

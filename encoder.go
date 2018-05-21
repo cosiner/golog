@@ -57,74 +57,74 @@ func (t *TypeEncoder) EncodeVal(buf *bytes.Buffer, val interface{}) {
 		t.EncodeTime(buf, v)
 	case time.Duration:
 		t.EncodeDuration(buf, v)
-	case []int8:
-		for _, v := range v {
-			t.EncodeInt(buf, int64(v))
-		}
-	case []int16:
-		for _, v := range v {
-			t.EncodeInt(buf, int64(v))
-		}
-	case []int32:
-		for _, v := range v {
-			t.EncodeInt(buf, int64(v))
-		}
-	case []int64:
-		for _, v := range v {
-			t.EncodeInt(buf, int64(v))
-		}
-	case []int:
-		for _, v := range v {
-			t.EncodeInt(buf, int64(v))
-		}
-	case []uint16:
-		for _, v := range v {
-			t.EncodeUint(buf, uint64(v))
-		}
-	case []uint32:
-		for _, v := range v {
-			t.EncodeUint(buf, uint64(v))
-		}
-	case []uint64:
-		for _, v := range v {
-			t.EncodeUint(buf, uint64(v))
-		}
-	case []uint:
-		for _, v := range v {
-			t.EncodeUint(buf, uint64(v))
-		}
-	case []float32:
-		for _, v := range v {
-			t.EncodeFloat(buf, float64(v))
-		}
-	case []float64:
-		for _, v := range v {
-			t.EncodeFloat(buf, float64(v))
-		}
-	case []complex64:
-		for _, v := range v {
-			t.EncodeComplex(buf, complex128(v))
-		}
-	case []complex128:
-		for _, v := range v {
-			t.EncodeComplex(buf, complex128(v))
-		}
-	case []bool:
-		for _, v := range v {
-			t.EncodeBool(buf, v)
-		}
-	case []string:
-		for _, v := range v {
-			t.EncodeString(buf, v)
-		}
-	case []time.Time:
-		for _, v := range v {
-			t.EncodeTime(buf, v)
-		}
-	case []time.Duration:
-		for _, v := range v {
-			t.EncodeDuration(buf, v)
-		}
+	//case []int8:
+	//	for _, v := range v {
+	//		t.EncodeInt(buf, int64(v))
+	//	}
+	//case []int16:
+	//	for _, v := range v {
+	//		t.EncodeInt(buf, int64(v))
+	//	}
+	//case []int32:
+	//	for _, v := range v {
+	//		t.EncodeInt(buf, int64(v))
+	//	}
+	//case []int64:
+	//	for _, v := range v {
+	//		t.EncodeInt(buf, int64(v))
+	//	}
+	//case []int:
+	//	for _, v := range v {
+	//		t.EncodeInt(buf, int64(v))
+	//	}
+	//case []uint16:
+	//	for _, v := range v {
+	//		t.EncodeUint(buf, uint64(v))
+	//	}
+	//case []uint32:
+	//	for _, v := range v {
+	//		t.EncodeUint(buf, uint64(v))
+	//	}
+	//case []uint64:
+	//	for _, v := range v {
+	//		t.EncodeUint(buf, uint64(v))
+	//	}
+	//case []uint:
+	//	for _, v := range v {
+	//		t.EncodeUint(buf, uint64(v))
+	//	}
+	//case []float32:
+	//	for _, v := range v {
+	//		t.EncodeFloat(buf, float64(v))
+	//	}
+	//case []float64:
+	//	for _, v := range v {
+	//		t.EncodeFloat(buf, float64(v))
+	//	}
+	//case []complex64:
+	//	for _, v := range v {
+	//		t.EncodeComplex(buf, complex128(v))
+	//	}
+	//case []complex128:
+	//	for _, v := range v {
+	//		t.EncodeComplex(buf, complex128(v))
+	//	}
+	//case []bool:
+	//	for _, v := range v {
+	//		t.EncodeBool(buf, v)
+	//	}
+	//case []string:
+	//	for _, v := range v {
+	//		t.EncodeString(buf, v)
+	//	}
+	//case []time.Time:
+	//	for _, v := range v {
+	//		t.EncodeTime(buf, v)
+	//	}
+	//case []time.Duration:
+	//	for _, v := range v {
+	//		t.EncodeDuration(buf, v)
+	//	}
 	case fmt.Stringer:
 		t.EncodeString(buf, v.String())
 	case error:
