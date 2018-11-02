@@ -5,11 +5,9 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
-
-	"bitbucket.org/cosiner/goutils/stringutil"
-	"bitbucket.org/cosiner/goutils/timeutil"
 )
 
 const (
@@ -149,7 +147,7 @@ func (w *singleFileWriter) logfileName(datetime string) string {
 
 func (w *singleFileWriter) parseLogDate(filename string) (string, bool) {
 	filename = filepath.Base(filename)
-	secs := stringutil.SplitNonEmpty(filename, ".")
+	secs := strings.Split(filename, ".")
 	if len(secs) != 2 || secs[1] != "log" || secs[0] == "" {
 		return "", false
 	}
@@ -169,11 +167,13 @@ func cleanLogFiles(opts *FileLogOptions, nowdate string, parseLogDate func(strin
 	if err != nil {
 		return
 	}
-	nowT, err := timeutil.ParseLocal(logFileDateFmt, nowdate)
+	nowT, err := time.Parse(logFileDateFmt, nowdate)
 	if err != nil {
 		return
 	}
-	expiredate := nowT.Add(-timeutil.Day * time.Duration(opts.ExpireDays)).Format(logFileDateFmt)
+	nowT = nowT.In(time.Local)
+
+	expiredate := nowT.Add(-time.Hour * 24 * time.Duration(opts.ExpireDays)).Format(logFileDateFmt)
 	for _, item := range items {
 		if item.IsDir() {
 			continue

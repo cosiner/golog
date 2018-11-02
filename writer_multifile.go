@@ -3,10 +3,9 @@ package golog
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
-
-	"bitbucket.org/cosiner/goutils/stringutil"
 )
 
 type multiFileWriter struct {
@@ -92,7 +91,7 @@ func (w *multiFileWriter) logfileName(level Level, datetime string) string {
 
 func (w *multiFileWriter) parseLogDate(filename string) (string, bool) {
 	filename = filepath.Base(filename)
-	secs := stringutil.SplitNonEmpty(filename, ".")
+	secs := strings.Split(filename, ".")
 	if len(secs) != 3 || secs[2] != "log" || secs[0] == "" || secs[1] == "" {
 		return "", false
 	}
